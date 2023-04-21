@@ -29,7 +29,8 @@ def t_ID(t):
     return t 
 
 def t_STRING(t):
-    r'\'[^\']*\''
+    #r'\'[^\']*\''
+    r'"([^"\n]|(\\"))*"$'
     return t.value[1:-1]
 
 t_ignore = ' \t\r\n'
@@ -38,7 +39,8 @@ def t_error(t):
     print(f"error : {t.value[0]}")
     t.lexer.skip(1)
 
-def tokenize(input: str): 
+
+def tokenize(input: str):
     lexer = lex.lex()
     lexer.input(input)
     tokens = []
