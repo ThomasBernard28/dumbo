@@ -30,7 +30,7 @@ def t_ID(t):
 
 def t_STRING(t):
     #r'\'[^\']*\''
-    r'"([^"\n]|(\\"))*"$'
+    r'\'([^"\n]|(\\"))*\'$'
     return t.value[1:-1]
 
 t_ignore = ' \t\r\n'
