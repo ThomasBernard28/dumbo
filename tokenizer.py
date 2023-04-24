@@ -64,7 +64,7 @@ def t_CODE_STRING(t):
     t.value = t.value[1:-1] #Sert à supprimer les guillemets autour de la chaîne
     return t
 
-t_CODE_ignore = ' \t\r\n'
+t_CODE_ignore = ' \t'
 
 def t_newline(t):
     r'\n+'
