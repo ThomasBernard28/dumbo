@@ -1,23 +1,16 @@
 import ply.yacc as yacc
 from tokenizer import tokens
 
-
-def p_expression_dumboblock(p):
-    '''expression : LBRACE LBRACE expression_list RBRACE RBRACE'''
-    p[0] = p[3]
-
-
-def p_expression_list(p):
-    '''expression_list : expression SEMICOLON expression_list
-                       | expression'''
-    if len(p) == 4:
-        p[0] = [p[1]] + p[3]
-    else:
+"""
+Génération de la syntaxe Dumbo sur bae de la grammaire fournie dans l'énoncé.
+"""
+def p_programme(p):
+    '''programme : txt
+               | txt programme'''
+    if len(p) == 2:
         p[0] = [p[1]]
-
-def p_expression_id(p):
-    '''expression : ID'''
-    p[0] = p[1]
+    else:
+        p[0] = [p[1]] + p[2]
 
 
 parser = yacc.yacc(outputdir='generated')

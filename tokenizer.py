@@ -2,36 +2,48 @@ import ply.lex as lex
 
 # tokens
 tokens = (
+    ### Tokens de base ###
     'ID',
-    'LBRACE',
-    'RBRACE',
     'QUOTE',
     'SEMICOLON',
     'COMMA',
+    'DOT',
     'LPAREN',
     'RPAREN',
     'ASSIGN',
     'STRING',
+    'DBLOCK_START',
+    'DBLOCK_END',
+    #####################
 )
 
-# regex
-t_QUOTE = '\''
+
+
+### Regex tokens de base ###
 t_SEMICOLON = r';'
-t_LBRACE = r'{'
-t_RBRACE = r'}'
+t_COMMA = r','
+t_DOT = r'\.'
 t_ASSIGN = r':='
 t_LPAREN = r'\('
 t_RPAREN = r'\)'
-t_COMMA = r','
+############################
+
 
 def t_ID(t):
-    r'[a-zA-Z_][a-zA-Z0-9_]*'
-    return t 
+    r'[a-zA-Z0-9_]+'
+    return t
 
 def t_STRING(t):
-    #r'\'[^\']*\''
-    r'\'([^"\n]|(\\"))*\'$'
-    return t.value[1:-1]
+    r"'[^']*'"
+    t.value = t.value[1:-1] #Sert à supprimer les guillemets autour de la chaîne
+    return t
+def t_DBLOCK_START(t):
+    r'{{'
+    return t
+
+def t_DBLOCK_END(t):
+    r'\}\}'
+    return t
 
 t_ignore = ' \t\r\n'
 
