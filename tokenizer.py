@@ -65,6 +65,7 @@ def t_CODE_STRING(t):
     return t
 
 t_CODE_ignore = ' \t'
+t_TEXT_ignore = ' \t\n'
 
 def t_newline(t):
     r'\n+'
