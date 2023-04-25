@@ -64,6 +64,10 @@ def p_stringlst_interior(p):
     else:
         p[0] = [p[1]] + p[3]
 
+def p_error(p):
+    print("Syntax error in line {}".format(p.lineno))
+    print("Illegal character '%s'" % p.value[0])
+
 
 parser = yacc.yacc(outputdir='generated')
 

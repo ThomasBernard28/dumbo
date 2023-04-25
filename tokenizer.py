@@ -78,7 +78,7 @@ def t_error(t):
 
 lexer = lex.lex()
 lexer.begin('TEXT')
-
+'''
 def tokenize(input: str):
     lexer = lex.lex()
     # On commence dans l'état TEXT car c'est le plus général.
@@ -90,3 +90,5 @@ def tokenize(input: str):
         tokens.append((token.type, token.value))
 
     return tokens
+    
+'''
