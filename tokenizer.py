@@ -76,6 +76,9 @@ def t_error(t):
     t.lexer.skip(1)
 
 
+lexer = lex.lex()
+lexer.begin('TEXT')
+
 def tokenize(input: str):
     lexer = lex.lex()
     # On commence dans l'état TEXT car c'est le plus général.
