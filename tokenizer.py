@@ -1,7 +1,18 @@
 import ply.lex as lex
 
+#Reserved keywords (if, print, for, etc)
+
+reserved = {
+    'print' : 'PRINT',
+    'for' : 'FOR',
+    'in' : 'IN',
+    'do' : 'DO',
+    'endfor' : 'ENDFOR',
+    'if' : 'IF',
+    'endif' : 'ENDIF'
+}
 # tokens
-tokens = (
+tokens = [
     ### Tokens de base ###
     'ID',
     'QUOTE',
@@ -16,7 +27,9 @@ tokens = (
     'DBLOCK_END',
     'TXT'
     #####################
-)
+] + list(reserved.values())
+
+
 
 """ Voir section 4.19 de la doc de PLY 'Conditional lexing and start condtions' 
 
@@ -57,6 +70,7 @@ t_CODE_RPAREN = r'\)'
 
 def t_CODE_ID(t):
     r'[a-zA-Z0-9_]+'
+    t.type = reserved.get(t.value, 'ID') #thanks to https://ply.readthedocs.io/en/latest/ply.html
     return t
 
 def t_CODE_STRING(t):
@@ -76,9 +90,9 @@ def t_error(t):
     t.lexer.skip(1)
 
 
-lexer = lex.lex()
-lexer.begin('TEXT')
-'''
+#lexer = lex.lex()
+#lexer.begin('TEXT')
+
 def tokenize(input: str):
     lexer = lex.lex()
     # On commence dans l'état TEXT car c'est le plus général.
@@ -90,5 +104,3 @@ def tokenize(input: str):
         tokens.append((token.type, token.value))
 
     return tokens
-    
-'''
