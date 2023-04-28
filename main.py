@@ -1,6 +1,13 @@
 from ply import lex
 import lexer
 
+def readFile(file):
+    lines = ""
+    with open(file, 'r') as f:
+        lines = f.read()
+
+    return lines
+
 if __name__ == '__main__':
     import sys
 
@@ -13,12 +20,5 @@ if __name__ == '__main__':
         dataFile = sys.argv[1]
         templateFile = sys.argv[2]
 
-        data = ""
-        with open(dataFile, 'r') as f:
-            data = f.read()
-
-        template = ""
-        with open(templateFile, 'r') as f:
-            template = f.read()
-
-        print(lexer.toToken(dataFile))
+        print(lexer.toToken(readFile(dataFile)))
+        print(lexer.toToken(readFile(templateFile)))
