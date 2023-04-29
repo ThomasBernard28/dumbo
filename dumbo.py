@@ -1,27 +1,24 @@
-import sys
-import tokenizer
-import syntaxer
+from ply import lex
+import lexer
 
-def read_file(file):
+def readFile(file):
     lines = ""
     with open(file, 'r') as f:
         lines = f.read()
+
     return lines
 
-def init_variables():
-    pass
-
-def inject_variables():
-    pass
-
 if __name__ == '__main__':
-    arg1 = sys.argv[1]
-    arg2 = sys.argv[2]
-    print(repr(read_file(arg2)))
-    print(tokenizer.tokenize(read_file(arg2)))
-    #print(syntaxer.parse(arg1))
-    """
-    for line in read_file(arg1):
-        print(line)
-        print(tokenizer.tokenize(line))
-    """
+    import sys
+
+    if len(sys.argv) == 1:
+        while True:
+            user_input = input(">>> Please enter a code line: ")
+            print(lexer.toToken(user_input))
+
+    elif len(sys.argv) == 3:
+        dataFile = sys.argv[1]
+        templateFile = sys.argv[2]
+
+        print(lexer.toToken(readFile(dataFile)))
+        print(lexer.toToken(readFile(templateFile)))

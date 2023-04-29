@@ -1,5 +1,5 @@
 import ply.yacc as yacc
-from tokenizer import tokens
+from lexer import tokens
 
 """
 Génération de la syntaxe Dumbo sur bae de la grammaire fournie dans l'énoncé.
