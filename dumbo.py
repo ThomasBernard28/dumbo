@@ -10,9 +10,11 @@ def loadFiles(dataFile, templateFile):
     # Parse files
     data = yacc.parse(rowData)
     template = yacc.parse(rowTemplate)
+    print(data)
 
     # Assign variables
     var = assignVar(data)
+    print(var)
     if var == {}:
         print("No variable found in data file")
         return
@@ -20,14 +22,38 @@ def loadFiles(dataFile, templateFile):
         insertVar(template, var)
 
 def insertVar(template, var):
-    # TODO: Insert variables in template
-    return
+    output = ""
+    for expr in template:
+        if type(expr) is str:
+            output += expr
+        elif type(expr[0]) is tuple:
+            if expr[0][0] == 'print':
+                output += applyPrint(expr[0], var)
+            elif expr[0][0] == 'for':
+                output += applyFor(expr[0], var)
+
+    return output
+
+def applyPrint(expr, var):
+    inserted = ""
+    toAdd = var.get(expr[1])
+    if type(toAdd) is str:
+        inserted += toAdd
+    else:
+        for item in toAdd:
+            inserted += item
+    return inserted
+
+def applyFor(expr, var):
+    print(expr)
+    toAdd = var.get(expr[2])
+    return ""
 
 def assignVar(data):
     var = {}
-    for i in range(len(data) -1):
-        for j in range(len(data[i])):
-            var[data[i][j][1]] = data[i][j][2]
+    for item in data[0]:
+        if item != None:
+            var[item[1]] = item[2]
     return var
 
 
