@@ -6,9 +6,9 @@ _tabversion = '3.10'
 
 _lr_method = 'LALR'
 
-_lr_signature = 'ASSIGN COMMA DBLOCK_END DBLOCK_START DO DOT ENDFOR ENDIF FOR ID IF IN LPAREN PRINT QUOTE RPAREN SEMICOLON STRING TXTprogramme : TXT\n               | TXT programmeprogramme : dumbo_block\n               | dumbo_block programmedumbo_block : DBLOCK_START expression_list DBLOCK_END\n                   | DBLOCK_START DBLOCK_ENDexpression_list : expression\n                       | expression expression_listexpression : ID ASSIGN stringexpr SEMICOLON\n                  | ID ASSIGN stringlst SEMICOLONstringexpr : STRING\n                  | ID\n                  | stringexpr DOT stringexprstringlst : LPAREN stringlst_interior RPARENstringlst_interior : stringexpr\n                          | stringexpr COMMA stringlst_interior'
+_lr_signature = 'AND ASSIGN COMMA DBLOCK_END DBLOCK_START DIVIDE DO DOT ENDFOR ENDIF FALSE FOR IF IN LPAREN MINUS NUMBER OR PLUS PRINT QUOTE RPAREN SEMICOLON STRING TIMES TRUE TXT VARprogram : TXT\n               | TXT programprogram : dumbo_block\n               | dumbo_block programdumbo_block : DBLOCK_START expression_list DBLOCK_END\n                    | DBLOCK_START DBLOCK_ENDexpression_list : expression SEMICOLON\n                       | expression SEMICOLON expression_liststring_expression : STRING\n                  | VAR\n                  | string_expression DOT string_expressionexpression : PRINT string_expressionexpression : FOR VAR IN string_list DO expression_list ENDFOR\n          | FOR VAR IN VAR DO expression_list ENDFORexpression : VAR ASSIGN string_expression\n                | VAR ASSIGN string_liststring_list : LPAREN string_list_interior RPARENstring_list_interior : STRING\n                            | STRING COMMA string_list_interior'
     
-_lr_action_items = {'TXT':([0,2,3,8,11,],[2,2,2,-6,-5,]),'DBLOCK_START':([0,2,3,8,11,],[4,4,4,-6,-5,]),'$end':([1,2,3,5,6,8,11,],[0,-1,-3,-2,-4,-6,-5,]),'DBLOCK_END':([4,7,9,12,19,21,],[8,11,-7,-8,-9,-10,]),'ID':([4,9,13,18,19,20,21,26,],[10,10,14,14,-9,14,-10,14,]),'ASSIGN':([10,],[13,]),'STRING':([13,18,20,26,],[17,17,17,17,]),'LPAREN':([13,],[18,]),'SEMICOLON':([14,15,16,17,24,25,],[-12,19,21,-11,-13,-14,]),'DOT':([14,15,17,23,24,],[-12,20,-11,20,20,]),'COMMA':([14,17,23,24,],[-12,-11,26,-13,]),'RPAREN':([14,17,22,23,24,27,],[-12,-11,25,-15,-13,-16,]),}
+_lr_action_items = {'TXT':([0,2,3,8,13,],[2,2,2,-6,-5,]),'DBLOCK_START':([0,2,3,8,13,],[4,4,4,-6,-5,]),'$end':([1,2,3,5,6,8,13,],[0,-1,-3,-2,-4,-6,-5,]),'DBLOCK_END':([4,7,14,20,],[8,13,-7,-8,]),'PRINT':([4,14,31,32,],[10,10,10,10,]),'FOR':([4,14,31,32,],[11,11,11,11,]),'VAR':([4,10,11,14,19,21,22,31,32,],[12,17,18,12,17,17,27,12,12,]),'SEMICOLON':([9,15,16,17,23,24,26,33,38,39,],[14,-12,-9,-10,-15,-16,-11,-17,-14,-13,]),'STRING':([10,19,21,25,34,],[16,16,16,30,30,]),'ASSIGN':([12,],[19,]),'ENDFOR':([14,20,35,36,],[-7,-8,38,39,]),'DOT':([15,16,17,23,26,],[21,-9,-10,21,21,]),'IN':([18,],[22,]),'LPAREN':([19,22,],[25,25,]),'DO':([27,28,33,],[31,32,-17,]),'RPAREN':([29,30,37,],[33,-18,-19,]),'COMMA':([30,],[34,]),}
 
 _lr_action = {}
 for _k, _v in _lr_action_items.items():
@@ -17,7 +17,7 @@ for _k, _v in _lr_action_items.items():
       _lr_action[_x][_k] = _y
 del _lr_action_items
 
-_lr_goto_items = {'programme':([0,2,3,],[1,5,6,]),'dumbo_block':([0,2,3,],[3,3,3,]),'expression_list':([4,9,],[7,12,]),'expression':([4,9,],[9,9,]),'stringexpr':([13,18,20,26,],[15,23,24,23,]),'stringlst':([13,],[16,]),'stringlst_interior':([18,26,],[22,27,]),}
+_lr_goto_items = {'program':([0,2,3,],[1,5,6,]),'dumbo_block':([0,2,3,],[3,3,3,]),'expression_list':([4,14,31,32,],[7,20,35,36,]),'expression':([4,14,31,32,],[9,9,9,9,]),'string_expression':([10,19,21,],[15,23,26,]),'string_list':([19,22,],[24,28,]),'string_list_interior':([25,34,],[29,37,]),}
 
 _lr_goto = {}
 for _k, _v in _lr_goto_items.items():
@@ -26,21 +26,24 @@ for _k, _v in _lr_goto_items.items():
        _lr_goto[_x][_k] = _y
 del _lr_goto_items
 _lr_productions = [
-  ("S' -> programme","S'",1,None,None,None),
-  ('programme -> TXT','programme',1,'p_programme_txt','syntaxer.py',8),
-  ('programme -> TXT programme','programme',2,'p_programme_txt','syntaxer.py',9),
-  ('programme -> dumbo_block','programme',1,'p_programme_dumbo','syntaxer.py',17),
-  ('programme -> dumbo_block programme','programme',2,'p_programme_dumbo','syntaxer.py',18),
-  ('dumbo_block -> DBLOCK_START expression_list DBLOCK_END','dumbo_block',3,'p_dumbo_block','syntaxer.py',25),
-  ('dumbo_block -> DBLOCK_START DBLOCK_END','dumbo_block',2,'p_dumbo_block','syntaxer.py',26),
-  ('expression_list -> expression','expression_list',1,'p_expression_list','syntaxer.py',33),
-  ('expression_list -> expression expression_list','expression_list',2,'p_expression_list','syntaxer.py',34),
-  ('expression -> ID ASSIGN stringexpr SEMICOLON','expression',4,'p_expression_assign_stringexpr_or_stringlst','syntaxer.py',41),
-  ('expression -> ID ASSIGN stringlst SEMICOLON','expression',4,'p_expression_assign_stringexpr_or_stringlst','syntaxer.py',42),
-  ('stringexpr -> STRING','stringexpr',1,'p_stringexpr','syntaxer.py',46),
-  ('stringexpr -> ID','stringexpr',1,'p_stringexpr','syntaxer.py',47),
-  ('stringexpr -> stringexpr DOT stringexpr','stringexpr',3,'p_stringexpr','syntaxer.py',48),
-  ('stringlst -> LPAREN stringlst_interior RPAREN','stringlst',3,'p_stringlst','syntaxer.py',55),
-  ('stringlst_interior -> stringexpr','stringlst_interior',1,'p_stringlst_interior','syntaxer.py',60),
-  ('stringlst_interior -> stringexpr COMMA stringlst_interior','stringlst_interior',3,'p_stringlst_interior','syntaxer.py',61),
+  ("S' -> program","S'",1,None,None,None),
+  ('program -> TXT','program',1,'p_program_txt','yacc.py',9),
+  ('program -> TXT program','program',2,'p_program_txt','yacc.py',10),
+  ('program -> dumbo_block','program',1,'p_program_dumbo','yacc.py',17),
+  ('program -> dumbo_block program','program',2,'p_program_dumbo','yacc.py',18),
+  ('dumbo_block -> DBLOCK_START expression_list DBLOCK_END','dumbo_block',3,'p_dumbo_block_expression_list','yacc.py',25),
+  ('dumbo_block -> DBLOCK_START DBLOCK_END','dumbo_block',2,'p_dumbo_block_expression_list','yacc.py',26),
+  ('expression_list -> expression SEMICOLON','expression_list',2,'p_expression_list','yacc.py',33),
+  ('expression_list -> expression SEMICOLON expression_list','expression_list',3,'p_expression_list','yacc.py',34),
+  ('string_expression -> STRING','string_expression',1,'p_string_expression','yacc.py',41),
+  ('string_expression -> VAR','string_expression',1,'p_string_expression','yacc.py',42),
+  ('string_expression -> string_expression DOT string_expression','string_expression',3,'p_string_expression','yacc.py',43),
+  ('expression -> PRINT string_expression','expression',2,'p_expression_print','yacc.py',53),
+  ('expression -> FOR VAR IN string_list DO expression_list ENDFOR','expression',7,'p_expression_for','yacc.py',57),
+  ('expression -> FOR VAR IN VAR DO expression_list ENDFOR','expression',7,'p_expression_for','yacc.py',58),
+  ('expression -> VAR ASSIGN string_expression','expression',3,'p_expression_assign','yacc.py',64),
+  ('expression -> VAR ASSIGN string_list','expression',3,'p_expression_assign','yacc.py',65),
+  ('string_list -> LPAREN string_list_interior RPAREN','string_list',3,'p_string_list','yacc.py',69),
+  ('string_list_interior -> STRING','string_list_interior',1,'p_string_list_interior','yacc.py',73),
+  ('string_list_interior -> STRING COMMA string_list_interior','string_list_interior',3,'p_string_list_interior','yacc.py',74),
 ]

@@ -1,5 +1,6 @@
 from ply import lex
 import lexer
+import yacc
 
 def readFile(file):
     lines = ""
@@ -15,10 +16,14 @@ if __name__ == '__main__':
         while True:
             user_input = input(">>> Please enter a code line: ")
             print(lexer.toToken(user_input))
+            print(yacc.parse(user_input))
 
     elif len(sys.argv) == 3:
         dataFile = sys.argv[1]
         templateFile = sys.argv[2]
 
-        print(lexer.toToken(readFile(dataFile)))
-        print(lexer.toToken(readFile(templateFile)))
+        #print(lexer.toToken(readFile(dataFile)))
+        #print(lexer.toToken(readFile(templateFile)))
+
+        print(yacc.parse(readFile(dataFile)))
+        #print(yacc.parse(readFile(templateFile)))

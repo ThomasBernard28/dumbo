@@ -140,6 +140,9 @@ def t_CODE_error(t):
     print("Illegal character '{}' at line {}".format(t.value[0], t.lexer.lineno))
     t.lexer.skip(1)
 
+lexer = lex.lex()
+lexer.begin('TEXT')
+
 def toToken(input: str):
     lexer = lex.lex()
     lexer.begin('TEXT')
