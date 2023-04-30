@@ -47,7 +47,7 @@ def p_string_expression(p):
         else:
             p[0] = p[1]
     elif len(p) == 4:
-        p[0] = ("assemble", p[1], p[3])
+        p[0] = ("assemble", p[1], p[3]) #Assemble the two strings thanks to ply syntax section 6.10
 
 def p_expression_print(p):
     '''expression : PRINT string_expression'''
@@ -82,8 +82,11 @@ def p_error(p):
     print("Syntax error in line {}".format(p.lineno))
     print("Illegal character '%s'" % p.value[0])
 
-parser = yacc.yacc(outputdir='generated')
+parser = yacc.yacc(outputdir='output')
 
+precedence = (
+    ('left', 'DOT')
+)
 
 def parse(input: str):
     return parser.parse(input, debug=False)
