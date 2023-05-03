@@ -1,7 +1,7 @@
 import syntaxer
 
 #We use a dictionnary to store variables and their values
-# There are multiples "levels" of variables depending on the scope
+# There are multiples "levels" of variables depending on the scope #Thx chat gpt for the idea
 # e.g if we are assigning a global variable it's level will be 0
 # but if we are assigning a variable in a for loop it's level will be 1
 # and if we are assigning a variable in a for loop in a for loop it's level will be 2 etc.
@@ -53,7 +53,7 @@ def insertDataInTemplate(template):
                 pass
             #Even though we assigned the data files variables there might be local variables
             #e.g in a for loop, etc
-            elif toApply == "assing":
+            elif toApply == "assign":
                 #assignLocalVars(item[1], item[2])
                 pass
     print(output)
