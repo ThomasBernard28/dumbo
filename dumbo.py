@@ -19,7 +19,7 @@ def initialize(rowData, rowTemplate):
     vars[level] = assignVar(data)
 
     #Insert variables in template
-    insertDataInTemplate(template)
+    print(insertDataInTemplate(template))
 
 
 def assignVar(data):
@@ -52,7 +52,7 @@ def insertDataInTemplate(template):
             #e.g in a for loop, etc
             elif toApply == "assign":
                 assignLocalVars(item[1], item[2])
-    print(output)
+    return output
 
 def applyPrint(expr):
     #We need to check if the variable is a string or a list
