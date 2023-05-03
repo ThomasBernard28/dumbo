@@ -32,7 +32,11 @@ tokens = [
     'PLUS',
     'MINUS',
     'TIMES',
-    'DIVIDE'
+    'DIVIDE',
+    'BIGGER',
+    'LOWER',
+    'EQUALS',
+    'DIFFERENT'
 ] + list(reserved.values())
 
 
@@ -119,6 +123,22 @@ def t_CODE_TIMES(t):
 
 def t_CODE_DIVIDE(t):
     r'/'
+    return t
+
+def t_CODE_BIGGER(t):
+    r'>'
+    return t
+
+def t_CODE_LOWER(t):
+    r'<'
+    return t
+
+def t_CODE_EQUALS(t):
+    r'='
+    return t
+
+def t_CODE_DIFFERENT(t):
+    r'!='
     return t
 
 t_CODE_ignore = ' \t\n'

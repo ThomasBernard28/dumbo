@@ -65,6 +65,42 @@ def p_expression_assign(p):
                 | VAR ASSIGN string_list'''
     p[0] = ("assign", p[1], p[3])
 
+def p_expression_number(p):
+    '''number : NUMBER
+              | NUMBER PLUS NUMBER
+              | NUMBER MINUS NUMBER
+              | NUMBER TIMES NUMBER
+              | NUMBER DIVIDE NUMBER'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        if p[2] == 'PLUS':
+            p[0] = p[1] + p[3]
+        if p[2] == 'MINUS':
+            p[0] = p[1] - p[3]
+        if p[2] == 'TIMES':
+            p[0] = p[1] * p[3]
+        if p[2] == 'DEVIDE':
+            p[0] = int(p[1] / p[3])
+
+def p_expression_boolean(p):
+    '''boolean : boolean OR boolean
+               | boolean AND boolean
+               | number BIGGER number
+               | number LOWER number
+               | number EQUALS number
+               | number DIFFERENT number
+               | TRUE
+               | FALSE'''
+    if len(p) == 2:
+        p[0] = p[1] == 'TRUE'
+    else:
+        p[0] = ("boolean", p[1], p[2], p[3])
+
+def p_expression_if(p):
+    '''expression_list : IF boolean DO expression_list ENDIF'''
+    p[0] = ("if", p[2], p[4])
+
 def p_string_list(p):
     '''string_list : LPAREN string_list_interior RPAREN'''
     p[0] = p[2]
