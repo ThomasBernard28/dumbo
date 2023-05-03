@@ -1,5 +1,6 @@
 import ply.yacc as yacc
-from lexer import tokens
+from tokenizer import tokens
+from dumbo import *
 
 """
 Génération de la syntaxe fournie dans l'énoncé.
@@ -17,9 +18,9 @@ def p_program_dumbo(p):
     '''program : dumbo_block
                | dumbo_block program'''
     if len(p) == 2:
-        p[0] = [p[1]]
+        p[0] = p[1]
     elif len(p) == 3:
-        p[0] = [p[1]] + p[2]
+        p[0] = p[1] + p[2]
 
 def p_dumbo_block_expression_list(p):
     '''dumbo_block : DBLOCK_START expression_list DBLOCK_END
@@ -47,11 +48,12 @@ def p_string_expression(p):
         else:
             p[0] = p[1]
     elif len(p) == 4:
-        p[0] = ("assemble", p[1], p[3]) #Assemble the two strings thanks to ply syntax section 6.10
+        p[0] = ("concat", p[1], p[3]) #Assemble the two strings thanks to ply syntax section 6.10
 
 def p_expression_print(p):
     '''expression : PRINT string_expression'''
     p[0] = ("print", p[2])
+
 
 def p_expression_for(p):
     '''expression : FOR VAR IN string_list DO expression_list ENDFOR
