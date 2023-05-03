@@ -9,7 +9,7 @@ level = 0
 
 vars = {}
 
-def initialize(rowData, rowTemplate):
+def run(rowData, rowTemplate):
     data = syntaxer.parse(rowData)
     template = syntaxer.parse(rowTemplate)
 
@@ -18,8 +18,8 @@ def initialize(rowData, rowTemplate):
     vars[level] = {}
     vars[level] = assignVar(data)
 
-    #Insert variables in template
-    print(insertDataInTemplate(template))
+    #Insert variables in template and return the result
+    return insertDataInTemplate(template)
 
 
 def assignVar(data):
@@ -110,6 +110,11 @@ if __name__ == '__main__':
         templateFile = sys.argv[2]
         rowData = readFile(dataFile)
         rowTemplate = readFile(templateFile)
+        #outputPath = sys.argv[3]
 
-        #Initialize
-        initialize(rowData, rowTemplate)
+        #Run the program and write the output
+        output = run(rowData, rowTemplate)
+        print(output)
+        #file = open(outputPath, "w")
+        #file.write(output)
+        #file.close()
