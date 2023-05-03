@@ -12,7 +12,6 @@ vars = {}
 def initialize(rowData, rowTemplate):
     data = syntaxer.parse(rowData)
     template = syntaxer.parse(rowTemplate)
-    print(data)
 
     # Assign variables
     global vars
@@ -38,7 +37,6 @@ def insertDataInTemplate(template):
     #Thanks to template3 we know that it might me empty
     if template == "":
         return ""
-    print(template)
     for item in template:
         if type(item) is str:
             #In case we are in the TEXT mode
@@ -49,29 +47,48 @@ def insertDataInTemplate(template):
             if toApply == "print":
                 output += applyPrint(item[1])
             elif toApply == "for":
-                #output += applyFor(item[1], item[2], item[3])
-                pass
+                output += applyFor(item[1], item[2], item[3])
             #Even though we assigned the data files variables there might be local variables
             #e.g in a for loop, etc
             elif toApply == "assign":
-                #assignLocalVars(item[1], item[2])
-                pass
+                assignLocalVars(item[1], item[2])
     print(output)
-
 
 def applyPrint(expr):
     #We need to check if the variable is a string or a list
+    index = 0
     if type(expr) is str:
         if type(vars[level].get(expr)) is str:
-            return vars[level].get(expr)
+            #We want to check every level of variables to see if the variable exists
+            while index <= level:
+                if expr in vars[index]:
+                    return vars[index][expr]
+                index += 1
         else:
-            raise Exception("Variable " + expr + " is not a string")
+            return expr
+
+
+def assignLocalVars(var, value):
+    if vars[level].get(var) == value:
+        return #Do nothing if the variable is already assigned to the value
     else:
-        raise Exception("Unknown variable type: " + type(vars[level][expr]))
+        vars[level][var] = value
 
+def applyFor(var, array, expr):
+    #Since we are in a for loop we need to increment the level
+    output = ""
+    global level
+    level += 1
+    #We need to check if the variable level exists before assigning it
+    if vars.get(level) is None:
+        vars[level] = {}
+    for item in vars[level - 1].get(array):
+        #Assign the variable
+        assignLocalVars(var, item)
+        #Apply the expression
+        output += insertDataInTemplate(expr)
 
-
-
+    return output
 
 def readFile(filename):
     # Read file
