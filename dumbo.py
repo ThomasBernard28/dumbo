@@ -12,7 +12,6 @@ vars = {}
 def run(rowData, rowTemplate):
     data = syntaxer.parse(rowData)
     template = syntaxer.parse(rowTemplate)
-    print(template)
 
     # Assign variables
     global vars
@@ -54,6 +53,7 @@ def insertDataInTemplate(template):
             elif toApply == "assign":
                 assignLocalVars(item[1], item[2])
             elif toApply == "concat":
+                print(item[1], item[2])
                 output += concat(item[1], item[2])
             elif toApply == "math_op":
                 output += mathOp(item[1], item[2], item[3])
@@ -93,11 +93,9 @@ def applyFor(var, array, expr):
 
 def concat(part1, part2):
     output = ""
-    #In this case we only need to concat strings or variables
-    if type(part2) is str:
-        if(part2 != "concat"):
-            output += checkIfAlreadyDefined(part1) + checkIfAlreadyDefined(part2)
-    #In this case we need to concat a variable and a expression tuple
+
+    if type(part2) is str and part2 != "concat":
+        output += checkIfAlreadyDefined(part1) + checkIfAlreadyDefined(part2)
     elif type(part2) is tuple:
         output += checkIfAlreadyDefined(part1) + insertDataInTemplate(part2)
 

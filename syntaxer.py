@@ -97,7 +97,7 @@ precedence = (
     ('left', 'MINUS'),
     ('left', 'TIMES'),
     ('left', 'DIVIDE'),
-    ('left', 'DOT'),
+    ('right', 'DOT'),
 )
 
 def p_error(p):
