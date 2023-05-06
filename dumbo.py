@@ -38,7 +38,7 @@ def insertDataInTemplate(template):
     if template == "":
         return ""
     for item in template:
-        if type(item) is str:
+        if type(item) is str and item != "concat":
             #In case we are in the TEXT mode
             output += item
         else:
@@ -53,7 +53,6 @@ def insertDataInTemplate(template):
             elif toApply == "assign":
                 assignLocalVars(item[1], item[2])
             elif toApply == "concat":
-                print(item[1], item[2])
                 output += concat(item[1], item[2])
             elif toApply == "math_op":
                 output += mathOp(item[1], item[2], item[3])
@@ -94,7 +93,7 @@ def applyFor(var, array, expr):
 def concat(part1, part2):
     output = ""
 
-    if type(part2) is str and part2 != "concat":
+    if type(part2) is str:
         output += checkIfAlreadyDefined(part1) + checkIfAlreadyDefined(part2)
     elif type(part2) is tuple:
         output += checkIfAlreadyDefined(part1) + insertDataInTemplate(part2)
@@ -119,6 +118,12 @@ def mathOp(part1, op, part2):
 
     if op == "+":
         output += str(part1 + part2)
+    elif op == "-":
+        output += str(part1 - part2)
+    elif op == "*":
+        output += str(part1 * part2)
+    elif op == "/":
+        output += str(part1 // part2)
 
     return output
 
