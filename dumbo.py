@@ -12,7 +12,6 @@ vars = {}
 def run(rowData, rowTemplate):
     data = syntaxer.parse(rowData)
     template = syntaxer.parse(rowTemplate)
-    print(template)
 
     # Assign variables
     global vars
