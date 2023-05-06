@@ -39,7 +39,6 @@ def insertDataInTemplate(template):
     if template == "":
         return ""
     for item in template:
-        print(item)
         if type(item) is str:
             #In case we are in the TEXT mode
             output += item
