@@ -48,10 +48,6 @@ states = (
     ('CODE', 'exclusive')
 )
 
-def t_TEXT_TXT(t):
-    r'[^{]+'
-    return t
-
 """ 
 Les conditions sont définies ci-dessous. On veut que lorsque l'on est dans l'état TEXT et que l'on rencontre le token DBLOCK_START on passe dans l'état CODE. 
 De la même manière on veut que lorsque l'on est dans l'état CODE et que l'on rencontre le token DBLOCK_END on passe dans l'état TEXT.
@@ -64,6 +60,10 @@ def t_TEXT_DBLOCK_START(t):
 def t_CODE_DBLOCK_END(t):
     r'}}'
     t.lexer.begin('TEXT')
+    return t
+
+def t_TEXT_TXT(t):
+    r'[^{]+'
     return t
 
 def t_CODE_VAR(t):
@@ -101,8 +101,8 @@ def t_CODE_SEMICOLON(t):
     return t
 
 def t_CODE_NUMBER(t):
-    r'\d+'
-    t.value = int(t.value)
+    r'\d+(\.d*)?'
+    t.value = int(t.value) if '.' not in t.value else float(t.value)
     return t
 
 def t_CODE_PLUS(t):
@@ -122,7 +122,6 @@ def t_CODE_DIVIDE(t):
     return t
 
 t_CODE_ignore = ' \t\n'
-t_TEXT_ignore = ' \t'
 
 def t_newline(t):
     r'\n+'
@@ -139,6 +138,12 @@ def t_TEXT_error(t):
 def t_CODE_error(t):
     print("Illegal character '{}' at line {}".format(t.value[0], t.lexer.lineno))
     t.lexer.skip(1)
+
+precedence = (
+    ("left", "DOT"),
+    ("left", "TIMES", "DIVIDE"),
+    ("left", "PLUS", "MINUS"),
+)
 
 lexer = lex.lex()
 lexer.begin('TEXT')

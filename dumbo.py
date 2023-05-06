@@ -12,6 +12,7 @@ vars = {}
 def run(rowData, rowTemplate):
     data = syntaxer.parse(rowData)
     template = syntaxer.parse(rowTemplate)
+    print(template)
 
     # Assign variables
     global vars
@@ -38,6 +39,7 @@ def insertDataInTemplate(template):
     if template == "":
         return ""
     for item in template:
+        print(item)
         if type(item) is str:
             #In case we are in the TEXT mode
             output += item
@@ -52,27 +54,28 @@ def insertDataInTemplate(template):
             #e.g in a for loop, etc
             elif toApply == "assign":
                 assignLocalVars(item[1], item[2])
+            elif toApply == "concat":
+                output += concat(item[1], item[2])
+            elif toApply == "math_op":
+                output += mathOp(item[1], item[2], item[3])
     return output
 
 def applyPrint(expr):
-    #We need to check if the variable is a string or a list
-    index = 0
     if type(expr) is str:
-        if type(vars[level].get(expr)) is str:
-            #We want to check every level of variables to see if the variable exists
-            while index <= level:
-                if expr in vars[index]:
-                    return vars[index][expr]
-                index += 1
-        else:
-            return expr
+        return checkIfAlreadyDefined(expr)
+    elif type(expr) is tuple:
+        return insertDataInTemplate(expr)
 
 
 def assignLocalVars(var, value):
-    if vars[level].get(var) == value:
-        return #Do nothing if the variable is already assigned to the value
-    else:
+    if type(value) is str:
+        vars[level][var] = checkIfAlreadyDefined(value)
+    elif type(value) is int or type(value) is float:
         vars[level][var] = value
+    elif type(value) is tuple:
+        if value[0] == "math_op":
+            vars[level][var] = mathOp(value[1], value[2], value[3])
+
 
 def applyFor(var, array, expr):
     #Since we are in a for loop we need to increment the level
@@ -87,8 +90,48 @@ def applyFor(var, array, expr):
         assignLocalVars(var, item)
         #Apply the expression
         output += insertDataInTemplate(expr)
+    return output
+
+def concat(part1, part2):
+    output = ""
+    #In this case we only need to concat strings or variables
+    if type(part2) is str:
+        if(part2 != "concat"):
+            output += checkIfAlreadyDefined(part1) + checkIfAlreadyDefined(part2)
+    #In this case we need to concat a variable and a expression tuple
+    elif type(part2) is tuple:
+        output += checkIfAlreadyDefined(part1) + insertDataInTemplate(part2)
 
     return output
+
+def mathOp(part1, op, part2):
+    output = ""
+
+    if type(part1) is str:
+        part1 = checkIfAlreadyDefined(part1)
+        try :
+            part1 = int(part1)
+        except ValueError:
+            raise Exception("Cannot convert " + part1 + " to int")
+    if type(part2) is str:
+        part2 = checkIfAlreadyDefined(part2)
+        try :
+            part2 = int(part2)
+        except ValueError:
+            raise Exception("Cannot convert " + part2 + " to int")
+
+    if op == "+":
+        output += str(part1 + part2)
+
+    return output
+
+def checkIfAlreadyDefined(varName):
+    index = level
+    while index >= 0:
+        if varName in vars[index]:
+            return vars[index][varName]
+        index -= 1
+    return varName
 
 def readFile(filename):
     # Read file

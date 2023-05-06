@@ -1,5 +1,5 @@
 <html>
-   <head><title>{{ print nom; }}</title></head>
+   <head><title>{{ print nom;  }}</title></head>
    <body>
       <h1>{{ print nom; }}</h1>
       {{

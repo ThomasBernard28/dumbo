@@ -51,7 +51,8 @@ def p_string_expression(p):
         p[0] = ("concat", p[1], p[3]) #Assemble the two strings thanks to ply syntax section 6.10
 
 def p_expression_print(p):
-    '''expression : PRINT string_expression'''
+    '''expression : PRINT string_expression
+                  | PRINT numerical_expression'''
     p[0] = ("print", p[2])
 
 
@@ -64,7 +65,8 @@ def p_expression_for(p):
 
 def p_expression_assign(p):
     '''expression : VAR ASSIGN string_expression
-                | VAR ASSIGN string_list'''
+                | VAR ASSIGN string_list
+                | VAR ASSIGN numerical_expression'''
     p[0] = ("assign", p[1], p[3])
 
 def p_string_list(p):
@@ -80,15 +82,24 @@ def p_string_list_interior(p):
     elif len(p) == 4:
         p[0] = [p[1]] + p[3]
 
+def p_numerical_expression(p):
+    '''numerical_expression : NUMBER
+                            | VAR
+                            | numerical_expression PLUS numerical_expression
+                            | numerical_expression MINUS numerical_expression
+                            | numerical_expression TIMES numerical_expression
+                            | numerical_expression DIVIDE numerical_expression'''
+    if len(p) == 2:
+        p[0] = p[1]
+    elif len(p) == 4:
+        p[0] = ("math_op", p[1], p[2], p[3])
+
 def p_error(p):
     print("Syntax error in line {}".format(p.lineno))
     print("Illegal character '%s'" % p.value[0])
 
 parser = yacc.yacc(outputdir='output')
 
-precedence = (
-    ('left', 'DOT')
-)
 
 def parse(input: str):
     return parser.parse(input, debug=False)
