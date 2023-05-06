@@ -1,6 +1,5 @@
 import ply.yacc as yacc
 from tokenizer import tokens
-from dumbo import *
 
 """
 Génération de la syntaxe fournie dans l'énoncé.
@@ -40,8 +39,8 @@ def p_expression_list(p):
 
 def p_string_expression(p):
     '''string_expression : STRING
-                  | VAR
-                  | string_expression DOT string_expression'''
+                        | VAR
+                        | string_expression DOT string_expression'''
     if len(p) == 2:
         if p[1][0] == '\'':
             p[0] = p[1]
@@ -51,8 +50,7 @@ def p_string_expression(p):
         p[0] = ("concat", p[1], p[3]) #Assemble the two strings thanks to ply syntax section 6.10
 
 def p_expression_print(p):
-    '''expression : PRINT string_expression
-                  | PRINT numerical_expression'''
+    '''expression : PRINT string_expression'''
     p[0] = ("print", p[2])
 
 
@@ -93,6 +91,14 @@ def p_numerical_expression(p):
         p[0] = p[1]
     elif len(p) == 4:
         p[0] = ("math_op", p[1], p[2], p[3])
+
+precedence = (
+    ('left', 'PLUS'),
+    ('left', 'MINUS'),
+    ('left', 'TIMES'),
+    ('left', 'DIVIDE'),
+    ('left', 'DOT'),
+)
 
 def p_error(p):
     print("Syntax error in line {}".format(p.lineno))
