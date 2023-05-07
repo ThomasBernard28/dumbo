@@ -50,6 +50,8 @@ def insertDataInTemplate(template):
                 output += applyFor(item[1], item[2], item[3])
                 global level
                 level -= 1
+            elif toApply == "if":
+                output += applyIf(item[1], item[2])
             #Even though we assigned the data files variables there might be local variables
             #e.g in a for loop, etc
             elif toApply == "assign":
@@ -58,8 +60,6 @@ def insertDataInTemplate(template):
                 output += concat(item[1], item[2])
             elif toApply == "math_op":
                 output += mathOp(item[1], item[2], item[3])
-            elif toApply == "bool_op":
-                output += boolOp(item[1], item[2], item[3])
     return output
 
 def applyPrint(expr):
@@ -133,26 +133,49 @@ def mathOp(part1, op, part2):
 
     return output
 
-def boolOp(part1, op, part2):
+def applyIf(condition, expr):
     output = ""
-    if type(part1) is str:
-        part1 = checkIfAlreadyDefined(part1)
-        try:
-            part1 = bool(part1)
-        except ValueError:
-            raise Exception("Cannot convert " + part1 + " to bool")
-    if type(part2) is str:
-        part2 = checkIfAlreadyDefined(part2)
-        try:
-            part2 = bool(part2)
-        except ValueError:
-            raise Exception("Cannot convert " + part2 + " to bool")
-    if op == "AND":
-        output += str(part1 and part2)
-    if op == "OR":
-        output += str(part1 or part2)
+    if evaluate_condition(condition):
+        output += insertDataInTemplate(expr)
     return output
+        
+def evaluate_condition(expr):
+    if type(expr) == bool:
+        return expr
+    part1 = expr[1]
+    op = expr[2]
+    part2 = expr[3]
+    if type(part1) == tuple:
+        part1 = evaluate_condition(part1)
+    if type(part2) == tuple:
+        part2 = evaluate_condition(part2)
 
+    if expr[0] == "bool_comp":
+        return boolComp(part1, op, part2)
+    elif expr[0] == "bool_op":
+        return boolOp(part1, op, part2)
+
+def boolComp(part1, op, part2):
+    part1 = int(part1)
+    part2 = int(part2)
+    if op == ">" and part1 > part2:
+        return True
+    elif op == "<" and part1 < part2:
+        return True
+    elif op == "=" and part1 == part2:
+        return True
+    elif op == "!=" and part1 != part2:
+        return True
+    return False
+
+def boolOp(part1, op, part2):
+    part1 = bool(part1)
+    part2 = bool(part2)
+    if op == "and" and (part1 and part2):
+        return True
+    if op == "or" and (part1 or part2):
+        return True
+    return False
 
 def checkIfAlreadyDefined(varName):
     index = level

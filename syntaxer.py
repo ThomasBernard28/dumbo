@@ -100,20 +100,36 @@ def p_boolean_expression(p):
                        | boolean_and_expression
     '''
     if len(p) == 2:
-        p[0] = ("bool_op", p[1])
+        p[0] = p[1]
     else:
         p[0] = ("bool_op", p[1], p[2], p[3])
 
 def p_boolean_and_expression(p):
     '''
-    boolean_and_expression : TRUE
+    boolean_and_expression : boolean_comparison
+                           | TRUE
                            | FALSE
                            | boolean_and_expression AND boolean_and_expression
     '''
     if len(p) == 2:
-        p[0] = ("bool_op", p[1])
+        p[0] = p[1]
     else:
         p[0] = ("bool_op", p[1], p[2], p[3])
+
+def p_boolean_comparison(p):
+    '''
+    boolean_comparison : numerical_expression BIGGER numerical_expression
+                       | numerical_expression LOWER numerical_expression
+                       | numerical_expression EQUALS numerical_expression
+                       | numerical_expression DIFFERENT numerical_expression
+    '''
+    p[0] = ("bool_comp", p[1], p[2], p[3])
+
+def p_if_expression(p):
+    '''
+    expression : IF boolean_expression DO expression_list ENDIF
+    '''
+    p[0] = ("if", p[2], p[4])
 
 precedence = (
     ('left', 'PLUS'),
