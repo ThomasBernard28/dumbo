@@ -78,7 +78,6 @@ def assignLocalVars(var, value):
         if value[0] == "math_op":
             vars[level][var] = mathOp(value[1], value[2], value[3])
 
-
 def applyFor(var, array, expr):
     #Since we are in a for loop we need to increment the level
     output = ""

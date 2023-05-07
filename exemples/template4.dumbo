@@ -4,7 +4,7 @@
         <h1>{{ print nom; }}</h1>
         {{
             i := 0;
-            for nom in liste_photo do
+            for nom in listephoto do
                 if i > 0 do print ', '; endif;
                 print '<a href="'.nom.'">'.nom.'</a>';
 
