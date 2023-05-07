@@ -56,6 +56,8 @@ def insertDataInTemplate(template):
                 output += concat(item[1], item[2])
             elif toApply == "math_op":
                 output += mathOp(item[1], item[2], item[3])
+            elif toApply == "bool_op":
+                output += boolOp(item[1], item[2], item[3])
     return output
 
 def applyPrint(expr):
@@ -125,6 +127,26 @@ def mathOp(part1, op, part2):
     elif op == "/":
         output += str(part1 // part2)
 
+    return output
+
+def boolOp(part1, op, part2):
+    output = ""
+    if type(part1) is str:
+        part1 = checkIfAlreadyDefined(part1)
+        try:
+            part1 = bool(part1)
+        except ValueError:
+            raise Exception("Cannot convert " + part1 + " to bool")
+    if type(part2) is str:
+        part2 = checkIfAlreadyDefined(part2)
+        try:
+            part2 = bool(part2)
+        except ValueError:
+            raise Exception("Cannot convert " + part2 + " to bool")
+    if op == "AND":
+        output += str(part1 and part2)
+    if op == "OR":
+        output += str(part1 or part2)
     return output
 
 def checkIfAlreadyDefined(varName):

@@ -64,7 +64,8 @@ def p_expression_for(p):
 def p_expression_assign(p):
     '''expression : VAR ASSIGN string_expression
                 | VAR ASSIGN string_list
-                | VAR ASSIGN numerical_expression'''
+                | VAR ASSIGN numerical_expression
+                | VAR ASSIGN boolean_expression'''
     p[0] = ("assign", p[1], p[3])
 
 def p_string_list(p):
@@ -92,11 +93,35 @@ def p_numerical_expression(p):
     elif len(p) == 4:
         p[0] = ("math_op", p[1], p[2], p[3])
 
+def p_boolean_expression(p):
+    '''
+    boolean_expression : 
+                       | boolean_and_expression OR boolean_and_expression
+                       | boolean_and_expression
+    '''
+    if len(p) == 2:
+        p[0] = ("bool_op", p[1])
+    else:
+        p[0] = ("bool_op", p[1], p[2], p[3])
+
+def p_boolean_and_expression(p):
+    '''
+    boolean_and_expression : TRUE
+                           | FALSE
+                           | boolean_and_expression AND boolean_and_expression
+    '''
+    if len(p) == 2:
+        p[0] = ("bool_op", p[1])
+    else:
+        p[0] = ("bool_op", p[1], p[2], p[3])
+
 precedence = (
     ('left', 'PLUS'),
     ('left', 'MINUS'),
     ('left', 'TIMES'),
     ('left', 'DIVIDE'),
+    ('left', 'AND'),
+    ('left', 'OR'),
     ('right', 'DOT'),
 )
 
