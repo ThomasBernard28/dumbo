@@ -48,6 +48,8 @@ def insertDataInTemplate(template):
                 output += applyPrint(item[1])
             elif toApply == "for":
                 output += applyFor(item[1], item[2], item[3])
+                global level
+                level -= 1
             #Even though we assigned the data files variables there might be local variables
             #e.g in a for loop, etc
             elif toApply == "assign":
@@ -62,7 +64,7 @@ def insertDataInTemplate(template):
 
 def applyPrint(expr):
     if type(expr) is str:
-        return checkIfAlreadyDefined(expr)
+        return str(checkIfAlreadyDefined(expr))
     elif type(expr) is tuple:
         return insertDataInTemplate(expr)
 
@@ -90,6 +92,8 @@ def applyFor(var, array, expr):
         assignLocalVars(var, item)
         #Apply the expression
         output += insertDataInTemplate(expr)
+
+    #We need to decrement the level
     return output
 
 def concat(part1, part2):
@@ -148,6 +152,7 @@ def boolOp(part1, op, part2):
     if op == "OR":
         output += str(part1 or part2)
     return output
+
 
 def checkIfAlreadyDefined(varName):
     index = level

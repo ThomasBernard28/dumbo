@@ -30,6 +30,51 @@ def assignVar(data):
                 raise Exception("Unknown expression type: " + item[0])
     return variables
 
+def applyIf(condition, expr):
+    if type(condition) is str:
+        if condition == "true":
+            return insertDataInTemplate(expr)
+        else:
+            return
+    elif type(condition) is tuple:
+        return insertDataInTemplate(condition)
+
+def applyComparison(part1, op, part2):
+    if type(part1) is str:
+        part1 = checkIfAlreadyDefined(part1)
+        try :
+            part1 = int(part1)
+        except ValueError:
+            raise Exception("Cannot convert " + part1 + " to int")
+
+
+def p_expression_if(p):
+    '''expression : IF boolean_expression DO expression_list ENDIF'''
+
+    p[0] = ("if", p[2], p[4])
+
+def p_boolean_expression(p):
+    '''boolean_expression :  boolean_expression AND boolean_expression
+                            | boolean_expression OR boolean_expression
+                            | boolean
+                            | comparison'''
+    if len(p) == 2:
+        p[0] = p[1]
+    elif len(p) == 4:
+        p[0] = ("bool_op", p[1], p[2], p[3])
+
+def p_comparison(p):
+    '''comparison :  numerical_expression EQUALS numerical_expression
+                    | numerical_expression DIFFERENT numerical_expression
+                    | numerical_expression GREATER numerical_expression
+                    | numerical_expression LESS numerical_expression'''
+    p[0] = ("comparison", p[1], p[2], p[3])
+
+def p_boolean(p):
+    '''boolean : TRUE
+                | FALSE'''
+    p[0] = p[1]
+
 
 
 def readFile(filename):
