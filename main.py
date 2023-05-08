@@ -7,12 +7,25 @@ e.g if we are assigning a global variable it's level will be 0
 but if we are assigning a variable in a for loop it's level will be 1
 and if we are assigning a variable in a for loop in a for loop it's level will be 2 etc.
 '''
+
 indent_level = 0
 variables = {}
 functions = ["print", "for", "if", "assign", "concat", "math_op"]
 
 
 def run(rowData, rowTemplate):
+    """
+    This method aims to run the program. It will parse the data and template files,
+    assign the variables and apply the template functions.
+
+    Keyword arguments:
+    rowData -- The data file.
+    rowTemplate -- The template file.
+
+    Return:
+    The result of the program.
+    """
+
     data = syntaxer.parse(rowData)
     template = syntaxer.parse(rowTemplate)
 
@@ -24,12 +37,17 @@ def run(rowData, rowTemplate):
     return applyTemplateFunctions(template)
 
 
-'''
-This method aims to store in the variables dictionary the variables that are in the data file.
-'''
-
-
 def assignDataVars(data):
+    """
+    This method aims to store in the variables' dictionary the variables that are in the data file.
+
+    Keyword arguments:
+    data -- The data set previously parsed.
+
+    Return:
+    The variables dictionary.
+    """
+
     for item in data:
         # We need to ensure that the item is a tuple
         if type(item) is tuple:
@@ -40,19 +58,24 @@ def assignDataVars(data):
     return variables
 
 
-'''
-This method aims to assign the variables from a template file.
-There are 2 cases:
-    - The variable is already in the variables dictionary :
-        - We update the value of the variable :
-            - If the value is a string or an int : we update the value
-            - If the value is a tuple : we apply the template functions to the value
-    - The variable is not in the variables dictionary :
-        - We add the variable to the dictionary :
-            - If the value is a string or an int : we add the variable
-            - If the value is a tuple : we apply the template functions to the value
-'''
 def assignLocalVars(varName, varValue):
+    """
+    This method aims to assign the variables from a template file.
+    There are 2 cases:
+        - The variable is already in the variables dictionary :
+            - We update the value of the variable :
+                - If the value is a string or an int : we update the value
+                - If the value is a tuple : we apply the template functions to the value
+        - The variable is not in the variables dictionary :
+            - We add the variable to the dictionary :
+                - If the value is a string or an int : we add the variable
+                - If the value is a tuple : we apply the template functions to the value
+
+    Keyword arguments:
+    varName -- The name of the variable.
+    varValue -- The value to assign to the variable.
+    """
+
     print(varName, varValue)
     searchResult = checkIfVarExists(varName)
 
@@ -74,14 +97,19 @@ def assignLocalVars(varName, varValue):
             variables[indent_level][varName] = applyTemplateFunctions(varValue)
 
 
-'''
-This method aims to apply the different function encountered during the evaluation of the template file.
-This method can be call recursively. The objective is to reduce the template file to basic expressions that
-will be evaluated by sub methods dedicated to each type of expression.
-'''
-
-
 def applyTemplateFunctions(template):
+    """
+    This method aims to apply the different function encountered during the evaluation of the template file.
+    This method can be call recursively. The objective is to reduce the template file to basic expressions that
+    will be evaluated by sub methods dedicated to each type of expression.
+
+    Keyword arguments:
+    template -- The current set of expression to be evaluated.
+
+    Return:
+    returns the evaluation of the expressions recursively.
+    """
+
     output = ""
     # Thanks to template3 we know that it might me empty
     if template == "":
@@ -119,16 +147,21 @@ def applyTemplateFunctions(template):
         return output
 
 
-'''
-This method aims to check if a variable exists in the variables dictionary.
-If it exists, it returns the variable name and its level.
-If it doesn't exist, it returns the variable name.
-With these information the other methods will be able to know 
-if they need to create a new variable or not.
-'''
-
-
 def checkIfVarExists(varName):
+    """
+    This method aims to check if a variable exists in the variables' dictionary.
+    If it exists, it returns the variable name and its level.
+    If it doesn't exist, it returns the variable name.
+    With these information the other methods will be able to know
+    if they need to create a new variable or not.
+
+    Keyword arguments:
+    varName -- The name of the variable to check.
+
+    Return:
+    The variable name and its level if it exists. The variable name if it doesn't exist.
+    """
+
     global indent_level
     currentLevel = indent_level
     # We want to check first at the deepest level
@@ -146,9 +179,20 @@ If it's a variable name it will return its value.
 If it's not a variable name it will return the string.
 If the expression is a tuple it will call the master function recursively.
 '''
-
-
 def applyPrint(expr):
+    """
+    This method aims to print an expression.
+    If the expression is a string it will first check if it's a variable name.
+    If it's a variable name it will return its value.
+    If it's not a variable name it will return the string.
+    If the expression is a tuple it will call the master function recursively.
+
+    Keyword arguments:
+    expr -- The expression to print.
+
+    Return:
+    The value of the expression if it's a variable name. The string if it's not a variable name.
+    """
     # First we want to check if the expression is a variable
     if type(expr) is str:
         # Then we want to check if it's a variable name
@@ -165,6 +209,21 @@ def applyPrint(expr):
 
 
 def applyFor(varName, array, expr):
+    """
+    This method aims to apply the for loop.
+    If the varName is a global variable, we will store the previous value of the variable.
+    Then we will iterate over the array and apply the template functions to the expression.
+    Finally, we will restore the previous value of the variable if it's a global variable.
+
+    Keyword arguments:
+    varName -- The name of the variable.
+    array -- The array to iterate over.
+    expr -- The expression(s) to apply to each item of the array.
+
+    Return:
+    The result of the for loop.
+    """
+
     output = ""
     # We first need to check if the variables level exists
     if variables.get(indent_level) is None:
@@ -198,17 +257,23 @@ def applyFor(varName, array, expr):
     return output
 
 
-'''
-This method aims to concatenate two expressions.
-By the syntax we defined we know that expr1 is a string.
-First we check if expr1 is a variable name or a string and we add it to the output.
-Then we check for expr2. If it's a string we add it to the output. 
-If it's a variable name we get its value and we add it to the output. 
-If it's a tuple we call the master function recursively.
-'''
-
-
 def applyConcat(expr1, expr2):
+    """
+    This method aims to concatenate two expressions.
+    By the syntax we defined we know that expr1 is a string.
+    First we check if expr1 is a variable name or a string, and we add it to the output.
+    Then we check for expr2. If it's a string we add it to the output.
+    If it's a variable name we get its value and we add it to the output.
+    If it's a tuple we call the master function recursively.
+
+    Keyword arguments:
+    expr1 -- The first expression to concatenate.
+    expr2 -- The second expression to concatenate.
+
+    Return:
+    The concatenation of the two expressions.
+    """
+
     output = ""
     # By the way we defined the syntax we know that expr1 is a string
     # We need to check if expr1 is a variable name
@@ -237,6 +302,24 @@ def applyConcat(expr1, expr2):
 
 
 def applyMathOp(expr1, op, expr2):
+    """
+    This method aims to apply a mathematical operation to two expressions.
+    First we check if expr1 is a variable name or a string, and if we can convert it to an int.
+    If we can convert it to an int we store it in expr1.
+    Then we check for expr2. If it's a string we add it to the output.
+    If it's a variable name we get its value and we add it to the output.
+    If it's a tuple we call the master function recursively.
+    If one of the expressions can't be converted to an int we raise an exception.
+
+    Keyword arguments:
+    expr1 -- The first expression to apply the operation to.
+    op -- The operation to apply.
+    expr2 -- The second expression to apply the operation to.
+
+    Return:
+    The result of the operation.
+    """
+
     output = ""
     # We need to check if expr1 is a variable name
     if type(expr1) is str:
