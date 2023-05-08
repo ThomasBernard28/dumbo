@@ -156,8 +156,18 @@ def evaluate_condition(expr):
         return boolOp(part1, op, part2)
 
 def boolComp(part1, op, part2):
-    part1 = int(part1)
-    part2 = int(part2)
+    if type(part1) is str:
+        part1 = checkIfAlreadyDefined(part1)
+        try :
+            part1 = int(part1)
+        except ValueError:
+            raise Exception("Cannot convert " + part1 + " to int")
+    if type(part2) is str:
+        part2 = checkIfAlreadyDefined(part2)
+        try :
+            part2 = int(part2)
+        except ValueError:
+            raise Exception("Cannot convert " + part2 + " to int")
     if op == ">" and part1 > part2:
         return True
     elif op == "<" and part1 < part2:
