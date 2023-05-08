@@ -10,7 +10,7 @@ and if we are assigning a variable in a for loop in a for loop it's level will b
 
 indent_level = 0
 variables = {}
-functions = ["print", "for", "if", "assign", "concat", "math_op"]
+functions = ["print", "for", "if", "assign", "concat", "math_op", "bool_comp"]
 
 
 def run(rowData, rowTemplate):
@@ -76,7 +76,6 @@ def assignLocalVars(varName, varValue):
     varValue -- The value to assign to the variable.
     """
 
-    print(varName, varValue)
     searchResult = checkIfVarExists(varName)
 
     # If the variable already exists
@@ -138,6 +137,12 @@ def applyTemplateFunctions(template):
                         indent_level += 1
                         output += applyFor(item[1], item[2], item[3])
                         indent_level -= 1
+                    case "if":
+                        indent_level += 1
+                        output += applyIf(item[1], item[2])
+                        indent_level -= 1
+                    case "bool_comp":
+                        applyBoolComp(item[1], item[2], item[3])
                     case "concat":
                         output += applyConcat(item[1], item[2])
                     case "math_op":
@@ -164,6 +169,8 @@ def checkIfVarExists(varName):
 
     global indent_level
     currentLevel = indent_level
+    if variables.get(currentLevel) is None:
+        variables[currentLevel] = {}
     # We want to check first at the deepest level
     while currentLevel >= 0:
         if varName in variables[currentLevel]:
@@ -172,13 +179,6 @@ def checkIfVarExists(varName):
     return varName
 
 
-'''
-This method aims to print an expression.
-If the expression is a string it will first check if it's a variable name.
-If it's a variable name it will return its value.
-If it's not a variable name it will return the string.
-If the expression is a tuple it will call the master function recursively.
-'''
 def applyPrint(expr):
     """
     This method aims to print an expression.
@@ -307,7 +307,7 @@ def applyMathOp(expr1, op, expr2):
     First we check if expr1 is a variable name or a string, and if we can convert it to an int.
     If we can convert it to an int we store it in expr1.
     Then we check for expr2. If it's a string we add it to the output.
-    If it's a variable name we get its value and we add it to the output.
+    If it's a variable name we get its value, and we add it to the output.
     If it's a tuple we call the master function recursively.
     If one of the expressions can't be converted to an int we raise an exception.
 
@@ -349,6 +349,80 @@ def applyMathOp(expr1, op, expr2):
             output += str(expr1 // expr2)
         case _:
             raise Exception("Unknown operation: " + op)
+
+    return output
+
+
+def applyIf(condition, expr):
+    output = ""
+    boolean = False
+    if type(condition) is tuple:
+        booleanCondition = applyTemplateFunctions(condition)
+        try:
+            boolean = bool(booleanCondition)
+        except ValueError:
+            raise Exception("Can't convert " + condition + " to bool")
+    if boolean:
+        output += applyTemplateFunctions(expr)
+
+    elif type(condition) is str:
+        try:
+            condition = bool(condition)
+        except ValueError:
+            raise Exception("Can't convert " + condition + " to bool")
+    if condition:
+        output += applyTemplateFunctions(expr)
+
+    return output
+
+
+def applyBoolComp(expr1, op, expr2):
+    output = ""
+    if type(expr1) is tuple:
+        expr1 = applyTemplateFunctions(expr1)
+
+    if type(expr2) is tuple:
+        expr2 = applyTemplateFunctions(expr2)
+
+    if type(expr1) is str:
+        searchResult1 = checkIfVarExists(expr1)
+        if type(searchResult1) is tuple:
+            try:
+                expr1 = int(variables[searchResult1[1]][searchResult1[0]])
+            except ValueError:
+                raise Exception("Can't convert " + expr1 + " to int")
+        else:
+            try:
+                expr1 = int(expr1)
+            except ValueError:
+                raise Exception("Can't convert " + expr1 + " to int")
+
+    if type(expr2) is str:
+        searchResult2 = checkIfVarExists(expr2)
+        if type(searchResult2) is tuple:
+            try:
+                expr2 = int(variables[searchResult2[1]][searchResult2[0]])
+            except ValueError:
+                raise Exception("Can't convert " + expr2 + " to int")
+        else:
+            try:
+                expr2 = int(expr2)
+            except ValueError:
+                raise Exception("Can't convert " + expr2 + " to int")
+
+    if type(expr1) is int:
+        if type(expr2) is int:
+            match op:
+                case "==":
+                    output += str(expr1 == expr2)
+                case "!=":
+                    output += str(expr1 != expr2)
+                case "<":
+                    output += str(expr1 < expr2)
+                case ">":
+                    output += str(expr1 > expr2)
+                case _:
+                    raise Exception("Unknown operation: " + op)
 
     return output
 
