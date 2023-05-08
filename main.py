@@ -11,6 +11,7 @@ indent_level = 0
 variables = {}
 functions = ["print", "for", "if", "assign", "concat", "math_op"]
 
+
 def run(rowData, rowTemplate):
     data = syntaxer.parse(rowData)
     template = syntaxer.parse(rowTemplate)
@@ -22,12 +23,15 @@ def run(rowData, rowTemplate):
 
     return applyTemplateFunctions(template)
 
+
 '''
 This method aims to store in the variables dictionary the variables that are in the data file.
 '''
+
+
 def assignDataVars(data):
     for item in data:
-        #We need to ensure that the item is a tuple
+        # We need to ensure that the item is a tuple
         if type(item) is tuple:
             if item[0] == "assign":
                 variables[item[1]] = item[2]
@@ -35,25 +39,39 @@ def assignDataVars(data):
                 raise Exception("Unknown expression type: " + item[0])
     return variables
 
+
 '''
 This method aims to assign the variables from a template file.
-There are multiple cases:
-- The variable is a string or an integer : 
-    1. we check if it exists in the variables dictionary
-    2. if it exists we update its value
-    3. if it doesn't exist we create it
-- The variable is a tuple :
-    1. we apply the applyTemplateFunctions method to the tuple
+There are 2 cases:
+    - The variable is already in the variables dictionary :
+        - We update the value of the variable :
+            - If the value is a string or an int : we update the value
+            - If the value is a tuple : we apply the template functions to the value
+    - The variable is not in the variables dictionary :
+        - We add the variable to the dictionary :
+            - If the value is a string or an int : we add the variable
+            - If the value is a tuple : we apply the template functions to the value
 '''
 def assignLocalVars(varName, varValue):
-    if type(varValue) is str or type(varValue) is int:
-        searchResult = checkIfVarExists(varName)
-        if type(searchResult) is tuple:
+    print(varName, varValue)
+    searchResult = checkIfVarExists(varName)
+
+    # If the variable already exists
+    if type(searchResult) is tuple:
+
+        if type(varValue) is str or type(varValue) is int:
             variables[searchResult[1]][searchResult[0]] = varValue
-        else:
+
+        elif type(varValue) is tuple:
+            variables[searchResult[1]][searchResult[0]] = applyTemplateFunctions(varValue)
+
+    else:
+
+        if type(varValue) is str or type(varValue) is int:
             variables[indent_level][varName] = varValue
-    elif type(varValue) is tuple:
-        variables[indent_level][varName] = applyTemplateFunctions(varValue)
+
+        elif type(varValue) is tuple:
+            variables[indent_level][varName] = applyTemplateFunctions(varValue)
 
 
 '''
@@ -61,9 +79,11 @@ This method aims to apply the different function encountered during the evaluati
 This method can be call recursively. The objective is to reduce the template file to basic expressions that
 will be evaluated by sub methods dedicated to each type of expression.
 '''
+
+
 def applyTemplateFunctions(template):
     output = ""
-    #Thanks to template3 we know that it might me empty
+    # Thanks to template3 we know that it might me empty
     if template == "":
         return ""
     else:
@@ -81,6 +101,8 @@ def applyTemplateFunctions(template):
                 # functionToApply is the function we need to apply to the item
                 functionToApply = item[0]
                 match functionToApply:
+                    case "assign":
+                        assignLocalVars(item[1], item[2])
                     case "print":
                         output += applyPrint(item[1])
                     case "for":
@@ -88,9 +110,15 @@ def applyTemplateFunctions(template):
                         indent_level += 1
                         output += applyFor(item[1], item[2], item[3])
                         indent_level -= 1
+                    case "concat":
+                        output += applyConcat(item[1], item[2])
+                    case "math_op":
+                        output += applyMathOp(item[1], item[2], item[3])
                     case _:
                         raise Exception("Unknown expression type: " + functionToApply)
         return output
+
+
 '''
 This method aims to check if a variable exists in the variables dictionary.
 If it exists, it returns the variable name and its level.
@@ -98,6 +126,8 @@ If it doesn't exist, it returns the variable name.
 With these information the other methods will be able to know 
 if they need to create a new variable or not.
 '''
+
+
 def checkIfVarExists(varName):
     global indent_level
     currentLevel = indent_level
@@ -108,6 +138,7 @@ def checkIfVarExists(varName):
         currentLevel -= 1
     return varName
 
+
 '''
 This method aims to print an expression.
 If the expression is a string it will first check if it's a variable name.
@@ -115,6 +146,8 @@ If it's a variable name it will return its value.
 If it's not a variable name it will return the string.
 If the expression is a tuple it will call the master function recursively.
 '''
+
+
 def applyPrint(expr):
     # First we want to check if the expression is a variable
     if type(expr) is str:
@@ -122,13 +155,14 @@ def applyPrint(expr):
         searchResult = checkIfVarExists(expr)
         # This means that the variable exists
         if type(searchResult) is tuple:
-            return variables[searchResult[1]][searchResult[0]]
+            return str(variables[searchResult[1]][searchResult[0]])
         else:
-            #This means that the variable doesn't exist so we return the string
+            # This means that the variable doesn't exist so we return the string
             return expr
     # We can't print a tuple, so we will call the master function recursively
     elif type(expr) is tuple:
         return applyTemplateFunctions(expr)
+
 
 def applyFor(varName, array, expr):
     output = ""
@@ -157,23 +191,96 @@ def applyFor(varName, array, expr):
         # Apply the template functions
         output += applyTemplateFunctions(expr)
 
-    #Before returning the output we need to set the var back to its previous value
+    # Before returning the output we need to set the var back to its previous value
     if previousValue is not None:
         variables[searchVarName[1]][searchVarName[0]] = previousValue
 
     return output
 
 
+'''
+This method aims to concatenate two expressions.
+By the syntax we defined we know that expr1 is a string.
+First we check if expr1 is a variable name or a string and we add it to the output.
+Then we check for expr2. If it's a string we add it to the output. 
+If it's a variable name we get its value and we add it to the output. 
+If it's a tuple we call the master function recursively.
+'''
+
+
+def applyConcat(expr1, expr2):
+    output = ""
+    # By the way we defined the syntax we know that expr1 is a string
+    # We need to check if expr1 is a variable name
+    searchResult1 = checkIfVarExists(expr1)
+
+    # If it's a variable name we need to get its value
+    if type(searchResult1) is tuple:
+        output += variables[searchResult1[1]][searchResult1[0]]
+
+    # If it's not a variable name we need to add the string
+    else:
+        output += expr1
+
+    # We need to check if expr2 is a variable name
+    if type(expr2) is str:
+        searchResult2 = checkIfVarExists(expr2)
+        if type(searchResult2) is tuple:
+            output += variables[searchResult2[1]][searchResult2[0]]
+        else:
+            output += expr2
+    # We can't concatenate a tuple, so we need to call the master function recursively
+    elif type(expr2) is tuple:
+        output += applyTemplateFunctions(expr2)
+
+    return output
+
+
+def applyMathOp(expr1, op, expr2):
+    output = ""
+    # We need to check if expr1 is a variable name
+    if type(expr1) is str:
+        searchResult1 = checkIfVarExists(expr1)
+        try:
+            expr1 = int(variables[searchResult1[1]][searchResult1[0]])
+        except ValueError:
+            raise Exception("Can't convert " + expr1 + " to int")
+    # We need to check if expr2 is a variable name
+    if type(expr2) is str:
+        searchResult2 = checkIfVarExists(expr2)
+        try:
+            expr2 = int(variables[searchResult2[1]][searchResult2[0]])
+        except ValueError:
+            raise Exception("Can't convert " + expr2 + " to int")
+
+    # Then we use a switch case to apply the operation
+    match op:
+        case "+":
+            output += str(expr1 + expr2)
+        case "-":
+            output += str(expr1 - expr2)
+        case "*":
+            output += str(expr1 * expr2)
+        case "/":
+            # As we only use integers we need to use the integer division
+            output += str(expr1 // expr2)
+        case _:
+            raise Exception("Unknown operation: " + op)
+
+    return output
+
+
 def readFile(filename):
     # Read file
-    lines = ""
     with open(filename, 'r') as f:
         lines = f.read()
     return lines
 
+
 if __name__ == '__main__':
 
     import sys
+
     if len(sys.argv) == 3:
         # Init files and data
         dataFile = sys.argv[1]
