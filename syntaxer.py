@@ -97,21 +97,11 @@ def p_numerical_expression(p):
 
 def p_boolean_expression(p):
     '''
-    boolean_expression : 
+    boolean_expression : TRUE
+                       | FALSE
+                       | boolean_comparison
                        | boolean_expression OR boolean_expression
-                       | boolean_and_expression
-    '''
-    if len(p) == 2:
-        p[0] = p[1]
-    else:
-        p[0] = ("bool_op", p[1], p[2], p[3])
-
-def p_boolean_and_expression(p):
-    '''
-    boolean_and_expression : boolean_comparison
-                           | TRUE
-                           | FALSE
-                           | boolean_and_expression AND boolean_and_expression
+                       | boolean_expression AND boolean_expression
     '''
     if len(p) == 2:
         p[0] = p[1]
