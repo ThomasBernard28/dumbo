@@ -27,7 +27,6 @@ tokens = [
     'DOT',
     'SEMICOLON',
     'COMMA',
-    'QUOTE',
     'NUMBER',
     'PLUS',
     'MINUS',
@@ -105,8 +104,8 @@ def t_CODE_SEMICOLON(t):
     return t
 
 def t_CODE_NUMBER(t):
-    r'\d+(\.d*)?'
-    t.value = int(t.value) if '.' not in t.value else float(t.value)
+    r'\d+'
+    t.value = int(t.value)
     return t
 
 def t_CODE_PLUS(t):

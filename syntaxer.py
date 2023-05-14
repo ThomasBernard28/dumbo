@@ -82,38 +82,18 @@ def p_string_list_interior(p):
         p[0] = [p[1]] + p[3]
 
 def p_numerical_expression(p):
-    '''numerical_expression : numerical_expression PLUS numerical_term
-                            | numerical_expression MINUS numerical_term
-                            | numerical_term
+    '''numerical_expression : VAR
+                            | NUMBER
+                            | numerical_expression PLUS numerical_expression
+                            | numerical_expression MINUS numerical_expression
+                            | numerical_expression TIMES numerical_expression
+                            | numerical_expression DIVIDE numerical_expression
+
     '''
     if len(p) == 2:
         p[0] = p[1]
     elif len(p) == 4:
         p[0] = ("math_op", p[1], p[2], p[3])
-
-def p_numerical_term(p):
-    '''
-    numerical_term : numerical_term TIMES numerical_base
-                   | numerical_term DIVIDE numerical_base
-                   | numerical_base
-    '''
-    if len(p) == 2:
-        p[0] = p[1]
-    elif len(p) == 4:
-        p[0] = ("math_op", p[1], p[2], p[3])
-
-def p_numerical_base(p):
-    '''
-    numerical_base : NUMBER
-                   | numerical_var
-    '''
-    p[0] = p[1]
-
-def p_numerical_var(p):
-    '''
-    numerical_var : VAR
-    '''
-    p[0] = p[1]
 
 def p_boolean_expression(p):
     '''
