@@ -305,7 +305,8 @@ def applyConcat(expr1, expr2):
 def applyMathOp(expr1, op, expr2):
     """
     This method aims to apply a mathematical operation to two expressions.
-    First we check if expr1 is a variable name or a string, and if we can convert it to an int.
+    First we check if expr1 and expr2 are tuples and if they are we call the master function recursively.
+    Then we check if expr1 is a variable name or a string, and if we can convert it to an int.
     If we can convert it to an int we store it in expr1.
     Then we check for expr2. If it's a string we add it to the output.
     If it's a variable name we get its value, and we add it to the output.
@@ -322,6 +323,13 @@ def applyMathOp(expr1, op, expr2):
     """
 
     output = ""
+    # Recursive cases were we can have operations of operations
+    if type(expr1) is tuple:
+        expr1 = applyTemplateFunctions(expr1)
+
+    if type(expr2) is tuple:
+        expr2 = applyTemplateFunctions(expr2)
+
     # We need to check if expr1 is a variable name
     if type(expr1) is str:
         searchResult1 = checkIfVarExists(expr1)
@@ -451,6 +459,7 @@ def applyBoolComp(expr1, op, expr2):
 
     return output
 
+
 def applyBoolOp(expr1, op, expr2):
     """
     This method aims to apply a boolean operation to two expressions. (OR, AND)
@@ -512,7 +521,6 @@ def applyBoolOp(expr1, op, expr2):
                     raise Exception("Unknown operation: " + op)
 
     return output
-
 
 
 def readFile(filename):
